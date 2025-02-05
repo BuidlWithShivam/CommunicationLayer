@@ -2,7 +2,6 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"phonePe/entity"
 )
 
@@ -10,9 +9,10 @@ type ProviderRepositoryImpl struct {
 	Providers map[string]*entity.Provider
 }
 
-func (p *ProviderRepositoryImpl) GetProviderForRequest(request entity.Request) (*entity.Provider, error) {
+func (p *ProviderRepositoryImpl) GetProvidersForRequest(request entity.Request) ([]*entity.Provider, error) {
 	critical := request.IsCritical()
 	communication := request.CriticalMessage()
+	var providers []*entity.Provider
 	for _, provider := range p.Providers {
 		if !provider.State {
 			continue
@@ -20,7 +20,7 @@ func (p *ProviderRepositoryImpl) GetProviderForRequest(request entity.Request) (
 		if !critical {
 			for channel, _ := range provider.DefaultChannels {
 				if channel == request.Type() {
-					return provider, nil
+					providers = append(providers, provider)
 				}
 			}
 		} else {
@@ -28,14 +28,14 @@ func (p *ProviderRepositoryImpl) GetProviderForRequest(request entity.Request) (
 				if comm == communication {
 					for channel, _ := range accounts {
 						if channel == request.Type() {
-							return provider, nil
+							providers = append(providers, provider)
 						}
 					}
 				}
 			}
 		}
 	}
-	return nil, errors.New(fmt.Sprintf("No provider for requestType %v", request.Type()))
+	return providers, nil
 }
 
 func (p *ProviderRepositoryImpl) CreateProvider(provider *entity.Provider) (*entity.Provider, error) {

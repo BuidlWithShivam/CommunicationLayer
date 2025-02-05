@@ -8,5 +8,5 @@ type ProviderRepository interface {
 	DeleteProvider(*entity.Provider) error
 	GetProvider(string) (*entity.Provider, error)
 	UpdateState(string, bool) error
-	GetProviderForRequest(request entity.Request) (*entity.Provider, error)
+	GetProvidersForRequest(request entity.Request) ([]*entity.Provider, error)
 }

@@ -13,11 +13,11 @@ type EmailRequest struct {
 	Message  string `json:"message"`
 }
 
-func (e *EmailRequest) Type() RequestType {
+func (e EmailRequest) Type() RequestType {
 	return EMAIL
 }
 
-func (e *EmailRequest) Validate() (bool, error) {
+func (e EmailRequest) Validate() (bool, error) {
 	if e.Sender == "" {
 		return false, errors.New("Missing Sender")
 	}
@@ -33,14 +33,14 @@ func (e *EmailRequest) Validate() (bool, error) {
 	return true, nil
 }
 
-func (e *EmailRequest) Prefix() string {
+func (e EmailRequest) Prefix() string {
 	return "EM"
 }
 
-func (e *EmailRequest) Id() string {
+func (e EmailRequest) Id() string {
 	return e.RequestId
 }
 
-func (e *EmailRequest) SetId() {
+func (e EmailRequest) SetId() {
 	e.RequestId = e.Prefix() + util.GenerateRequestId()
 }

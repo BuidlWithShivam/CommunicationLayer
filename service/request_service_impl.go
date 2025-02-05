@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"phonePe/entity"
 	"phonePe/repository"
 )
@@ -30,6 +31,14 @@ func (r *RequestServiceImpl) ProcessRequest(request entity.Request) error {
 	if err != nil {
 		return err
 	}
+	fmt.Println("Provider selected : ", provider.Name)
 	err = provider.ProcessRequest(request)
+	return err
+}
+
+func (r *RequestServiceImpl) Callback(requestId string, data []byte) error {
+	fmt.Println("callback for request ", requestId)
+	_, err := r.RequestRepository.UpdateRequest(requestId, true)
+	defer fmt.Println("Something to do with response data : ", data)
 	return err
 }

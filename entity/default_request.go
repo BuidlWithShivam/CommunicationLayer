@@ -26,14 +26,14 @@ type DefaultRequest struct {
 	CallbackUrl string              `json:"callbackUrl"`
 }
 
-func (d *DefaultRequest) Process(processed bool) {
+func (d DefaultRequest) Process(processed bool) {
 	d.Processed = processed
 }
 
-func (d *DefaultRequest) IsCritical() bool {
+func (d DefaultRequest) IsCritical() bool {
 	return d.Critical
 }
 
-func (d *DefaultRequest) CriticalMessage() CritialCommuncation {
+func (d DefaultRequest) CriticalMessage() CritialCommuncation {
 	return d.CriticalMsg
 }

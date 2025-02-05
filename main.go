@@ -22,8 +22,8 @@ func main() {
 		UserName: "test",
 		Password: "test",
 		DefaultChannels: map[entity.RequestType]entity.ApiEndpoint{
-			entity.EMAIL: entity.ApiEndpoint{Api: "email1"},
-			entity.SMS:   entity.ApiEndpoint{Api: "sms1"},
+			entity.EMAIL: {Api: "email1"},
+			entity.SMS:   {Api: "sms1"},
 		},
 		CriticalChannels: map[entity.CritialCommuncation]map[entity.RequestType]entity.ApiEndpoint{
 			entity.OTPComm: {
@@ -36,6 +36,24 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Provider 1 created")
+
+	p2, err := providerService.AddProvider(&entity.ProviderRequest{
+		Name:     "Provider2",
+		UserName: "test1",
+		Password: "test1",
+		DefaultChannels: map[entity.RequestType]entity.ApiEndpoint{
+			entity.EMAIL: {Api: "email2"},
+		},
+	})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Provider 2 created")
+
+	err = providerService.UpdateState(p2.ProviderId, false)
+	if err != nil {
+		panic(err)
+	}
 
 	request := &entity.EmailRequest{
 		DefaultRequest: entity.DefaultRequest{},
@@ -51,6 +69,22 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("Request 1 processed")
+
+	request = &entity.EmailRequest{
+		DefaultRequest: entity.DefaultRequest{},
+		Sender:         "test2",
+		Receiver:       "test1",
+		Subject:        "abcde",
+		Message:        "qwerty1",
+	}
+	request.SetId()
+	err = requestService.ProcessRequest(request)
+
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Request 2 processed")
+
 }
 
 // Request > RequestTypes > DifferentRequest for each type > Callback and processed, critical

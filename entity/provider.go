@@ -22,25 +22,25 @@ type ApiEndpoint struct {
 
 func (p Provider) ProcessRequest(request Request) error {
 	if request.Type() == EMAIL {
-		processEmailRequest(request)
+		processEmailRequest(request.(*EmailRequest))
 	} else if request.Type() == SMS {
-		processSmsRequest(request)
+		processSmsRequest(request.(*SmsRequest))
 	} else if request.Type() == SOUNDBOX {
-		processSoundBoxRequest(request)
+		processSoundBoxRequest(request.(*SoundBoxRequest))
 	} else {
 		fmt.Println("Unknown Request Type")
 	}
 	return nil
 }
 
-func processEmailRequest(request Request) {
+func processEmailRequest(request *EmailRequest) {
 	fmt.Println("Email Request Processed")
 }
 
-func processSmsRequest(request Request) {
+func processSmsRequest(request *SmsRequest) {
 	fmt.Println("Sms Request Processed")
 }
 
-func processSoundBoxRequest(request Request) {
+func processSoundBoxRequest(request *SoundBoxRequest) {
 	fmt.Println("SoundBox Request Processed")
 }

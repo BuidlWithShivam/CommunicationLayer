@@ -11,11 +11,11 @@ type SmsRequest struct {
 	Message string `json:"message"`
 }
 
-func (e *SmsRequest) Type() RequestType {
+func (e SmsRequest) Type() RequestType {
 	return SMS
 }
 
-func (e *SmsRequest) Validate() (bool, error) {
+func (e SmsRequest) Validate() (bool, error) {
 	if e.Mobile == "" {
 		return false, errors.New("Mobile is required")
 	}
@@ -25,14 +25,14 @@ func (e *SmsRequest) Validate() (bool, error) {
 	return true, nil
 }
 
-func (e *SmsRequest) Prefix() string {
+func (e SmsRequest) Prefix() string {
 	return "SM"
 }
 
-func (e *SmsRequest) Id() string {
+func (e SmsRequest) Id() string {
 	return e.RequestId
 }
 
-func (e *SmsRequest) SetId() {
+func (e SmsRequest) SetId() {
 	e.RequestId = e.Prefix() + util.GenerateRequestId()
 }

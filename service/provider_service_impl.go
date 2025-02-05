@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+	"math/rand"
 	"phonePe/entity"
 	"phonePe/repository"
 	"phonePe/util"
@@ -42,5 +44,13 @@ func (p ProviderServiceImpl) UpdateProvider(provider *entity.Provider) (*entity.
 }
 
 func (p ProviderServiceImpl) GetProviderForRequest(request entity.Request) (*entity.Provider, error) {
-	return p.providerRepository.GetProviderForRequest(request)
+	providers, _ := p.providerRepository.GetProvidersForRequest(request)
+	return p.AllocateProvider(providers)
+}
+
+func (p ProviderServiceImpl) AllocateProvider(providers []*entity.Provider) (*entity.Provider, error) {
+	if len(providers) == 0 {
+		return nil, errors.New("provider is empty")
+	}
+	return providers[rand.Intn(len(providers))], nil
 }
