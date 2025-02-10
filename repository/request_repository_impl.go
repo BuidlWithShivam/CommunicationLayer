@@ -3,30 +3,35 @@ package repository
 import (
 	"errors"
 	"phonePe/entity"
+	"sync"
 )
 
 type RequestRepositoryImpl struct {
-	Requests map[string]entity.Request
+	requests map[string]entity.Request
+	mutex    *sync.Mutex
 }
 
 func NewRequestRepositoryImpl() *RequestRepositoryImpl {
 	return &RequestRepositoryImpl{
-		Requests: make(map[string]entity.Request),
+		requests: make(map[string]entity.Request),
+		mutex:    &sync.Mutex{},
 	}
 }
 
 func (r *RequestRepositoryImpl) UpdateRequest(requestId string, processed bool) (entity.Request, error) {
-	request, ok := r.Requests[requestId]
+	request, ok := r.requests[requestId]
 	if !ok {
 		return nil, errors.New("Request Not Found")
 	}
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
 	request.Process(processed)
-	r.Requests[requestId] = request
+	r.requests[requestId] = request
 	return request, nil
 }
 
 func (r *RequestRepositoryImpl) GetRequest(requestId string) (entity.Request, error) {
-	request, ok := r.Requests[requestId]
+	request, ok := r.requests[requestId]
 	if !ok {
 		return nil, errors.New("Request Not Found")
 	}
@@ -34,6 +39,6 @@ func (r *RequestRepositoryImpl) GetRequest(requestId string) (entity.Request, er
 }
 
 func (r *RequestRepositoryImpl) CreateRequest(request entity.Request) (entity.Request, error) {
-	r.Requests[request.Id()] = request
+	r.requests[request.Id()] = request
 	return request, nil
 }

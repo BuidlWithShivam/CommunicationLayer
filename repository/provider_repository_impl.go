@@ -3,17 +3,61 @@ package repository
 import (
 	"errors"
 	"phonePe/entity"
+	"sync"
 )
 
 type ProviderRepositoryImpl struct {
-	Providers map[string]*entity.Provider
+	providers map[string]*entity.Provider
+	mutex     *sync.Mutex
+}
+
+func NewProviderRepositoryImpl() *ProviderRepositoryImpl {
+	return &ProviderRepositoryImpl{
+		providers: make(map[string]*entity.Provider),
+		mutex:     &sync.Mutex{},
+	}
+}
+
+func (p *ProviderRepositoryImpl) CreateProvider(provider *entity.Provider) (*entity.Provider, error) {
+	p.providers[provider.Id()] = provider
+	return provider, nil
+}
+
+func (p *ProviderRepositoryImpl) UpdateProvider(provider *entity.Provider) (*entity.Provider, error) {
+	_, ok := p.providers[provider.Id()]
+	if !ok {
+		return provider, errors.New("provider not found")
+	}
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	p.providers[provider.Id()] = provider
+	return provider, nil
+}
+
+func (p *ProviderRepositoryImpl) GetProvider(providerId string) (*entity.Provider, error) {
+	provider, ok := p.providers[providerId]
+	if !ok {
+		return provider, errors.New("provider not found")
+	}
+	return provider, nil
+}
+
+func (p *ProviderRepositoryImpl) UpdateState(providerId string, state bool) error {
+	provider, ok := p.providers[providerId]
+	if !ok {
+		return errors.New("provider not found")
+	}
+	p.mutex.Lock()
+	defer p.mutex.Unlock()
+	provider.State = state
+	return nil
 }
 
 func (p *ProviderRepositoryImpl) GetProvidersForRequest(request entity.Request) ([]*entity.Provider, error) {
 	critical := request.IsCritical()
 	communication := request.CriticalMessage()
 	var providers []*entity.Provider
-	for _, provider := range p.Providers {
+	for _, provider := range p.providers {
 		if !provider.State {
 			continue
 		}
@@ -36,46 +80,4 @@ func (p *ProviderRepositoryImpl) GetProvidersForRequest(request entity.Request) 
 		}
 	}
 	return providers, nil
-}
-
-func (p *ProviderRepositoryImpl) CreateProvider(provider *entity.Provider) (*entity.Provider, error) {
-	p.Providers[provider.Id()] = provider
-	return provider, nil
-}
-
-func (p *ProviderRepositoryImpl) UpdateProvider(provider *entity.Provider) (*entity.Provider, error) {
-	_, ok := p.Providers[provider.Id()]
-	if !ok {
-		return provider, errors.New("provider not found")
-	}
-	p.Providers[provider.Id()] = provider
-	return provider, nil
-}
-
-func (p *ProviderRepositoryImpl) DeleteProvider(provider *entity.Provider) error {
-	delete(p.Providers, provider.Id())
-	return nil
-}
-
-func (p *ProviderRepositoryImpl) GetProvider(providerId string) (*entity.Provider, error) {
-	provider, ok := p.Providers[providerId]
-	if !ok {
-		return provider, errors.New("provider not found")
-	}
-	return provider, nil
-}
-
-func (p *ProviderRepositoryImpl) UpdateState(providerId string, state bool) error {
-	provider, ok := p.Providers[providerId]
-	if !ok {
-		return errors.New("provider not found")
-	}
-	provider.State = state
-	return nil
-}
-
-func NewProviderRepositoryImpl() *ProviderRepositoryImpl {
-	return &ProviderRepositoryImpl{
-		Providers: make(map[string]*entity.Provider),
-	}
 }
