@@ -12,8 +12,8 @@ type Provider struct {
 	CriticalChannels map[CritialCommuncation]map[RequestType]ApiEndpoint `json:"criticalChannels"`
 }
 
-func (provider *Provider) Id() string {
-	return provider.ProviderId
+func (p *Provider) Id() string {
+	return p.ProviderId
 }
 
 type ApiEndpoint struct {

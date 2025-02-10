@@ -12,7 +12,8 @@ import (
 
 func main() {
 	providerRepository := repository.NewProviderRepositoryImpl()
-	providerService := service.NewProviderServiceImpl(providerRepository)
+	allocationService := service.NewRandomAllocationService()
+	providerService := service.NewProviderServiceImpl(providerRepository, allocationService)
 
 	requestRepository := repository.NewRequestRepositoryImpl()
 	requestService := service.NewRequestServiceImpl(requestRepository, providerService)
